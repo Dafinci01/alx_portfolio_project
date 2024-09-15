@@ -42,8 +42,11 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         # Handle login logic here
-        flash(f'Login requested for {form.email.data}!', 'info')
-        return redirect(url_for('home'))
+        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
+            flash('you have beeen  logged in!', 'success')
+            return redirect(url_for('home'))
+        else:
+             flash('Login Unsuuccesful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 if __name__ == '__main__':
