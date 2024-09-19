@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="content-section">
-        <form method="Post" action="">
+        <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4"> Join Today</legend>
@@ -80,7 +80,7 @@
             <small class="text-muted">
                 <!--the href should links to  a login page , remember to link back to  a login page or any
                 other page it is better to use a "url for function" which shoul pass in the name of the function not the route-->
-                Already Have An Account? <a class="ml-2" href="{{url_for('login')}}">Sign in</a>
+                Already Have An Account? <a class="ml-2" href="{{url_for('login')}} ">Sign in</a>
             </small>
         </div>
         
