@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Github Stats for {{ user.login }} </h2>
+    <p><strong> Name:</strong>{{user.name}}</p>
+    <p><strong>Bio</strong>{{ user.bio}} </p>
+    <p><strong> Public Repos:</strong>{{ user.public_repos }}</p>
+    <p><strong>Followers:</strong>{{ user.followers }}</p>
+    <p><strong> Gist: </strong> {{ user.public_gists }}</strong></p>
+
+    <img src="{{ user.avatar_url }}" alt="Avatar" style="width:100px;height:100px;">
+    <h3>Repositories</h3>
+    <ul>
+        {% for repo in user.repo %}
+            <li>
+                <a href="{{ repo.html_url }}"></a>
+                <span> Stars: {{repo.stargazers_count }} | Forks: {{ repo.forks_count }} </span>
+            </li>
+            {% endfor %}
+    </ul>
+
+    <a href="{{ user.html_url}}" class="btn btn-primary" > View Github Profile </a>
+    {% endblock %}

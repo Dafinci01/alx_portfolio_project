@@ -1,0 +1,10 @@
+{% extends "layourt.html %}
+{% block content %}
+    <h2>Account Settings</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div>{{ form.username.label }} {{ form.username() }}</div>
+        <div>{{ form.email.label }} {{ form.email() }}</div>
+        <button type="submit">Update</button>
+    </form>
+{% endblock %}

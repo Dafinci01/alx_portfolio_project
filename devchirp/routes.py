@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect
+from flask import render_template, url_for, flash, redirect, request
 from devchirp import db, app
 from devchirp.models import User, Post
 from devchirp.forms  import RegistrationForm, LoginForm, PostForm, UpdateProfileForm  # Import your database setup here
@@ -25,7 +25,7 @@ posts = [
 @app.route("/home")
 def home():
     page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.data_posted.desc()).paginate(page=page, per_page=5)
+    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('home.html', posts=posts)
 
 @app.route("/about")
@@ -62,7 +62,7 @@ def logout():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(content=form.content.data, author=current_user)  # Create new post
+        post = Post(title=form.title.data, content=form.content.data, author=current_user)  # Create new post
         db.session.add(post)
         db.session.commit()  # Save post to database
         flash('Your post has been created!', 'success')  # Success message after post creation
@@ -85,11 +85,19 @@ def account():
 
 @app.route('/github_stats/<username>')
 def github_stats(username):
-    github_api_url = f"https://api.github.com/users/{username}"  # GitHub API URL for fetching user data
-    response = requests.get(github_api_url)
-    if response.status == 200:
-        user_data = response.json()  # Convert the response to JSON format
-        return render_template('github_stats.html', user=user_data)  # Pass the GitHub user data to the template
+    #bas
+    github_user_url = f"https://api.github.com/users/{username}"  # GitHub API URL for fetching user data
+    github_repos_url = f"https://api.github.com/users/{username}/repos"  # GitHub API URL for fetching user repositories
+    
+
+    # fetch user data
+    user_response = requests.get(github_user_url)
+    repos_response = requests.get(github_repos_url)
+    
+    if user_response.status_code == 200 and repos_response.status_code== 200:
+        user_data = user_response.json()  # Convert the response to JSON format
+        repos_data = repos_response.json()  # Convert the response to JSON format
+        return render_template('github_stats.html', user=user_data, repos=repos_data)  # Pass the GitHub user data to the template
     else:
         flash('GitHub user not found', 'danger')
         return redirect(url_for('home'))
