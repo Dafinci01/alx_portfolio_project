@@ -24,6 +24,7 @@ posts = [
 @app.route("/")
 @app.route("/home")
 def home():
+    #write acomment ehere 
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('home.html', posts=posts)
@@ -32,12 +33,21 @@ def home():
 def about():
     return render_template("about.html", title='About')
 
+#route to register new users 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+
     form = RegistrationForm()
     if form.validate_on_submit():
+    #check if tge email already exists im the database 
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            flash('Email already exists', 'danger')
+            return redirect(url_for('register'))
+        #added bcrypt passsword hashingto protect userd  from gettinmg hacked 
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+    
         db.session.add(user)
         db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
@@ -49,10 +59,13 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
+       #logic for logging in a user (1) first of all, query the database to check whether user exist
+       user = User.query.filter_by(email=form.email.data).first() #if user database eqauls to what user enters into data
+       # aconditional that verify if the passsword enter  verifies with what they enter into  databse 
+       if user and  bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
             return redirect(url_for('home'))
-        else:
+       else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
