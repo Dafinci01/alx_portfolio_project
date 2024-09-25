@@ -14,6 +14,8 @@ db= SQLAlchemy(app)  # Initialize the database
 migrate = Migrate(app, db)  # Initialize the migration 
 bcrypt = Bcrypt(app)  # Initialize the encryption
 login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
 #with app.app_context():
 #    db.create_all()     # This will create all tables if they don't exist yet
 #from . import routes  # Import routes after app is defined

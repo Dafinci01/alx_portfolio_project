@@ -3,13 +3,14 @@ from devchirp import db, app, bcrypt
 from devchirp.models import User, Post
 from devchirp.forms  import RegistrationForm, LoginForm, PostForm, UpdateProfileForm  # Import your database setup here
 from flask_login import login_user, current_user, logout_user, login_required
+from  sqlalchemy.exc import IntegrityError
 import requests
 
 # Dummy data for posts
 posts = [
     {
         'author': 'John Doe',
-        'title': 'Blog Post 1',
+        'title': 'Blog Post 1', 
         'content': 'First Post Content',
         'date_posted': 'April 20, 2018'
     },
@@ -36,7 +37,10 @@ def about():
 #route to register new users 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-
+    #logic to make user that has login not log out 
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
     form = RegistrationForm()
     if form.validate_on_submit():
     #check if tge email already exists im the database 
@@ -54,9 +58,13 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    
+    #logic to make user that has login not log out 
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
     form = LoginForm()
     if form.validate_on_submit():
        #logic for logging in a user (1) first of all, query the database to check whether user exist
@@ -68,6 +76,22 @@ def login():
        else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+
+def add_new_user(username, email, password, image_file = 'default.jpg'):
+    #check if a user with the same username or email already exists
+    existing_user = User.query.filter(
+        (User.username == username) | (User.email == email)).first()
+    if existing_user:
+        return "User already exists"
+    try :
+        new_user = User(username=username, email=email, password=password, image_file=image_file)
+        db.session.add(new_user)
+        db.session.commit()
+        return "User added successfully"
+    except IntegrityError:
+        db.session.rollback()
+        return "An error occurred"
 
 @app.route("/logout")
 def logout():
@@ -98,7 +122,7 @@ def account():
         return redirect(url_for('account'))  # Reload the account page
     form.username.data = current_user.username
     form.email.data = current_user.email
-    return render_template('account.html', title='Account', form=form)
+    return render_template('account.html', title='Account')
 
 @app.route('/github_stats/<username>')
 def github_stats(username):
@@ -119,3 +143,6 @@ def github_stats(username):
         flash('GitHub user not found', 'danger')
         return redirect(url_for('home'))
 
+#@app.route("/account")
+#def account():
+   # return render_template('account.html', title='Account')
