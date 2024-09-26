@@ -1,4 +1,4 @@
-from devchirp import db 
+from alx_portfolio_project.devchirp import db 
 from devchirp.model import User
 
 

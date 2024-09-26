@@ -3,7 +3,7 @@ from devchirp  import db, login_manager # Import db from home.py
 from flask_login import UserMixin #
 
 
-#used to
+                #used to
 @login_manager.user_loader 
 def load_user(user_id):  # a function load user that takes a load user id 
     return User.query.get(int(user_id)) # return user id 

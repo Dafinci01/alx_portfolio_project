@@ -25,7 +25,10 @@ posts = [
 @app.route("/")
 @app.route("/home")
 def home():
-    #write acomment ehere 
+    #redirect to log in page if the user is not logged in  
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+   #display homepage content only if the user is logged in
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     return render_template('home.html', posts=posts)
@@ -72,7 +75,8 @@ def login():
        # aconditional that verify if the passsword enter  verifies with what they enter into  databse 
        if user and  bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('home'))
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect (url_for('home'))
        else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -115,14 +119,18 @@ def new_post():
 def account():
     form = UpdateProfileForm()
     if form.validate_on_submit():
+        #update user details
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()  # Update changes to database
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))  # Reload the account page
-    form.username.data = current_user.username
-    form.email.data = current_user.email
-    return render_template('account.html', title='Account')
+    elif request.method == 'GET':
+        #prepopulate the form with the current user datas
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title='Account',  image_file=image_file, form=form)
 
 @app.route('/github_stats/<username>')
 def github_stats(username):
