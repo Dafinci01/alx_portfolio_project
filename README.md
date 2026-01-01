@@ -70,7 +70,7 @@ This project demonstrates:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/VaxChain.git
+   git clone https://github.com/yourusername/alx_portfolio_project.git
    cd VaxChain
    ```
 
