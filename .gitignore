@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# .NET
+bin/
+obj/
+*.csproj.user
+
+# Database
+*.sql.dump
+
+# Secrets
+.env
+appsettings.Development.json
